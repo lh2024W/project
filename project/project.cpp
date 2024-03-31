@@ -98,7 +98,7 @@ void showCarsInFile();
 /// </summary>
 /// <param name="order">структура Order</param>
 void saveOrderInFile(ServiceOrder* order);
-
+void showOrdersInFile();
 
 
 int main() {
@@ -151,7 +151,7 @@ int main() {
 				cout << "1 - Создание заказа\n 2 - Вывод информации о заказах\n 0 - Выход\n\n";
 				cin >> choice;
 				if (choice == 1) { createOrder(order, cars, orders, 100, orders_count); }
-				else if (choice == 2) { displayOrder(order, cars, orders, 100, 100, orders_count); }
+				else if (choice == 2) { showOrdersInFile(); }
 				else if (choice == 0)
 					break;
 			} 
@@ -164,7 +164,7 @@ int main() {
 				cout << "1 - Вывод всех заказов из файла\n2 - Поиск заказа по номеру автомобиля\n";
 				cout << "3 - Удаление заказа из файла\n0 - Выход\n\n";
 				cin >> choice;
-				if (choice == 1) { showCarsInFile(); }
+				if (choice == 1) { showOrdersInFile(); }
 				else if (choice == 2) { cout << "Поиск заказа по номеру автомобиля\n"; }
 				else if (choice == 3) { cout << "Удаление заказа из файла\n"; }
 				else if (choice == 0)
@@ -199,7 +199,7 @@ void choiceMenuOrders(ServiceOrder& order, Car* cars, ServiceOrder* orders, int 
 	cout << "2 - Добавить еще заказ.\n";
 	cout << "0 - Выход.\n\n";
 	cin >> choice;
-	if (choice == 1) { displayOrder(order, cars, orders, n, m, orders_count); }
+	if (choice == 1) { showOrdersInFile(); }
 	else if (choice == 2) { createOrder(order, cars, orders, 100, orders_count); }
 	else if (choice == 0) { return; }
 }
@@ -316,6 +316,28 @@ void showCarsInFile() {
 			cout << "Марка: " << temp.model << "\n";
 			cout << "Год выпуска: " << temp.year << "\n";
 			cout << "Номерной знак: " << temp.licensePlate << "\n";
+			cout << "\n";
+			i++;
+		}
+		_getch();
+	}
+}
+
+void showOrdersInFile() {
+	int i = 0;
+	FILE* in = nullptr;
+	fopen_s(&in, "2.txt", "r");
+	if (in != nullptr) {
+		while (!feof(in)) {
+			ServiceOrder temp;
+			fread(&temp, sizeof(ServiceOrder), 1, in);
+
+			cout << "Модель: " << temp.car.brand << "\n";
+			cout << "Марка: " << temp.car.model << "\n";
+			cout << "Год выпуска: " << temp.car.year << "\n";
+			cout << "Номерной знак: " << temp.car.licensePlate << "\n";
+			cout << "Дата и время: " << temp.dateTime << "\n\n";
+			cout << "Описание работ: " << temp.description << "\n\n";
 			cout << "\n";
 			i++;
 		}
