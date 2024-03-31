@@ -99,6 +99,8 @@ void showCarsInFile();
 /// <param name="order">структура Order</param>
 void saveOrderInFile(ServiceOrder* order);
 void showOrdersInFile();
+void deleteOrderInFile(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count);
+int ReadCountItems(void* read, const int size, const char* filename);
 
 
 int main() {
@@ -165,8 +167,8 @@ int main() {
 				cout << "3 - Удаление заказа из файла\n0 - Выход\n\n";
 				cin >> choice;
 				if (choice == 1) { showOrdersInFile(); }
-				else if (choice == 2) { cout << "Поиск заказа по номеру автомобиля\n"; }
-				else if (choice == 3) { cout << "Удаление заказа из файла\n"; }
+				else if (choice == 2) { findOrderInFile(order, cars, orders, 100, 100, orders_count); }
+				else if (choice == 3) { deleteOrderInFile(order, cars, orders, 100, 100, orders_count); }
 				else if (choice == 0)
 					break;
 			}
@@ -370,4 +372,43 @@ void showOrdersInFile() {
 		}
 		_getch();
 	}
+}
+
+void deleteOrderInFile(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count) {
+	findOrderInFile(order, cars, orders, 100, 100, orders_count);
+
+	int key;
+	cout << "Введите номер заказа: ";
+	cin >> key;
+	ServiceOrder temp;
+	FILE* f;
+	int size = ReadCountItems(&temp, sizeof(ServiceOrder), "2.txt");
+	ServiceOrder* database = new ServiceOrder[size];
+	fopen_s(&f, "2.txt", "ab+");
+	fread(database, sizeof(ServiceOrder), size, f);
+	fclose(f);
+
+	fopen_s(&f, "2.txt", "wb+");
+	for (int i = 0; i < size; i++)
+	{
+		if (i > key - 1)
+			database[i].car.licensePlate = i;
+
+		if (i != key - 1)
+			fwrite(&database[i], sizeof(ServiceOrder), 1, f);
+	}
+
+	fclose(f);
+	delete[] database;
+}
+
+int ReadCountItems(void* read, const int size, const char* filename)
+{
+	FILE* f;
+	fopen_s(&f, filename, "ab+");
+	int count = 0;
+	while (fread(read, size, 1, f))
+		count++;
+	fclose(f);
+	return count;
 }
