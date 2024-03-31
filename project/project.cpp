@@ -80,7 +80,7 @@ void choiceMenuOrders(ServiceOrder& order, Car* cars, ServiceOrder* orders, int 
 /// </summary>
 /// <param name="cars">массив Cars</param>
 /// <param name="n">количество элементов массива Cars</param>
-void findAutoInFile(Car* car, Car* cars, int n);
+void findOrderInFile(const ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count);
 /// <summary>
 /// сохранить автомобиль в файл
 /// </summary>
@@ -273,18 +273,45 @@ void displayOrder(const ServiceOrder& order, Car* cars, ServiceOrder* orders, in
 	_getch();
 }
 
-void findAutoInFile(Car* car, Car* cars, int n) {
+void findOrderInFile(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count) {
+	FILE* f = nullptr;
+	int key;
+	char query[100];
+	cout << "Введите номерной знак автомобиля для поиска: ";
+	cin.ignore();
+	cin.getline(query, 100 - 1);
 
-	char number[10];
-	cout << "Введите номер авто для поиска: \n";
-	cin >> number;
-	for (int i = 0; i < n; i++) {
-		if (number == cars[i].licensePlate) {
-			cout << cars[i].brand, cars[i].model, cars[i].year, cars[i].licensePlate;
+	fopen_s(&f, "2.txt", "ab+");
+
+	ServiceOrder new_order;
+	while (fread(&new_order, sizeof(ServiceOrder), 1, f))
+		if (strcmp(query, new_order.car.licensePlate) == 0)
+			key = new_order.car.licensePlate;
+	fclose(f);
+	
+	fopen_s(&f, "2.txt", "ab+");
+	ServiceOrder order;
+	int k = 0;
+	while (fread(&order, sizeof(ServiceOrder), 1, f))
+	{
+		if (key == order.car.licensePlate)
+		{
+			cout << "Марка автомобиля: " << order.car.brand << "\n\n";
+			cout << "Модель автомобиля: " << order.car.model << "\n\n";
+			cout << "Год выпуска автомобиля: " << order.car.year << "\n\n";
+			cout << "Номерной знак автомобиля: " << order.car.licensePlate << "\n\n";
+
+			cout << "Дата и время: " << order.dateTime << "\n\n";
+			cout << "Описание работ: " << order.description << "\n\n";;
+			k++;
+			_getch();
 		}
-		else
-			cout << "Авто с таким номером не найдено.\n\n";
 	}
+
+	if (k == 0)
+		cout << "Нет авто с таким номером.";
+
+	fclose(f);
 }
 
 void saveCarInFile(const Car& car) {
@@ -336,8 +363,8 @@ void showOrdersInFile() {
 			cout << "Марка: " << temp.car.model << "\n";
 			cout << "Год выпуска: " << temp.car.year << "\n";
 			cout << "Номерной знак: " << temp.car.licensePlate << "\n";
-			cout << "Дата и время: " << temp.dateTime << "\n\n";
-			cout << "Описание работ: " << temp.description << "\n\n";
+			cout << "Дата и время: " << temp.dateTime << "\n";
+			cout << "Описание работ: " << temp.description << "\n";
 			cout << "\n";
 			i++;
 		}
