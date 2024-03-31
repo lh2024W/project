@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 #include <conio.h>
 #include <windows.h>
@@ -53,14 +53,14 @@ void displayCars(Car* cars, const int cars_count);
 /// <param name="car">информация об автомобиле</param>
 /// <param name="dateTime">дата и время заказа</param>
 /// <param name="description">описание работ</param>
-void createOrder(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m);
+void createOrder(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int& order_count);
 /// <summary>
 /// вывод информации о заказе на экран
 /// </summary>
 /// <param name="car">информация об автомобиле</param>
 /// <param name="dateTime">дата и время заказа</param>
 /// <param name="description">описание работ</param>
-void displayOrder(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m);
+void displayOrder(const ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count);
 /// <summary>
 /// выбор меню в разделе машины
 /// </summary>
@@ -74,7 +74,7 @@ void choiceMenuCars(Car* car, Car* cars, int n, int& cars_count);
 /// <param name="orders">массив Orders</param>
 /// <param name="n">количество элементов массива Cars</param>
 /// <param name="m">количество элементов массива Orders</param>
-void choiceMenuOrders(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m);
+void choiceMenuOrders(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count);
 /// <summary>
 /// поиск по номеру авто в массиве Cars
 /// </summary>
@@ -102,8 +102,10 @@ void saveOrderInFile(ServiceOrder* order);
 
 
 int main() {
+
 	setlocale(0, "");
 	system("title База СТО"); // СДЕЛАЛ ЗАГОЛОВОК ДЛЯ ОКНА
+
 	int chapter;
 	int choice;
 	Car car = {};
@@ -111,6 +113,7 @@ int main() {
 	Car cars[100];
 	int cars_count = 0; // ОБЩЕЕ КОЛИЧЕСТВО АВТО
 	ServiceOrder orders[100];
+	int orders_count = 0;
 
 	while (true) { // ЦИКЛ БЕСКОНЕЧНЫЙ (пока не введём ноль)
 		system("cls");
@@ -128,7 +131,7 @@ int main() {
 			{
 				system("cls"); // чистим экран
 				cout << "\nВыберите, пожалуйста, нужный Вам пункт меню:\n";
-				cout << "1 - Создание автомобиля\n 2 - Вывод информации об автомобиле\n 0 - Выход\n\n";
+				cout << "1 - Создание автомобиля\n 2 - Вывод информации об автомобилях\n 0 - Выход\n\n";
 				cin >> choice;
 				if (choice == 1) {
 					createCar(cars, 100, cars_count);
@@ -142,27 +145,31 @@ int main() {
 		}
 
 		else if (chapter == 2) {
-			do
+			while (true)
 			{
 				cout << "\nВыберите, пожалуйста нужный Вам пункт меню:\n";
-				cout << "1 - Создание заказа\n 2 - Вывод информации о заказе\n 0 - Выход\n\n";
+				cout << "1 - Создание заказа\n 2 - Вывод информации о заказах\n 0 - Выход\n\n";
 				cin >> choice;
-				if (choice == 1) { createOrder(&car, cars, &order, orders, 100, 100); }
-				if (choice == 2) { displayOrder(&car, cars, &order, orders, 100, 100); }
-			} while (choice == 0);
+				if (choice == 1) { createOrder(order, cars, orders, 100, orders_count); }
+				else if (choice == 2) { displayOrder(order, cars, orders, 100, 100, orders_count); }
+				else if (choice == 0)
+					break;
+			} 
 		}
 
 		else if (chapter == 3) {
-			do
+			while (true)
 			{
 				cout << "\nВыберите, пожалуйста нужный Вам пункт меню:\n";
 				cout << "1 - Вывод всех заказов из файла\n2 - Поиск заказа по номеру автомобиля\n";
 				cout << "3 - Удаление заказа из файла\n0 - Выход\n\n";
 				cin >> choice;
 				if (choice == 1) { showCarsInFile(); }
-				if (choice == 2) { cout << "Поиск заказа по номеру автомобиля\n"; }
-				if (choice == 3) { cout << "Удаление заказа из файла\n"; }
-			} while (choice == 0);
+				else if (choice == 2) { cout << "Поиск заказа по номеру автомобиля\n"; }
+				else if (choice == 3) { cout << "Удаление заказа из файла\n"; }
+				else if (choice == 0)
+					break;
+			}
 		}
 
 		else if (chapter == 0) {
@@ -181,21 +188,22 @@ void choiceMenuCars(Car* car, Car* cars, int n, int& cars_count) {
 	cout << "0 - Выход.\n\n";
 	cin >> choice;
 	if (choice == 1) { displayCar(*car); }
-	if (choice == 2) { createCar(cars, 100, cars_count); }
-	if (choice == 0) { return; }
+	else if (choice == 2) { createCar(cars, 100, cars_count); }
+	else if (choice == 0) { return; }
 }
 
-void choiceMenuOrders(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m) {
+void choiceMenuOrders(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count) {
 	int choice;
 	cout << "Выберите действие: \n";
 	cout << "1 - Посмотреть информацию о добавленном заказе.\n";
 	cout << "2 - Добавить еще заказ.\n";
 	cout << "0 - Выход.\n\n";
 	cin >> choice;
-	if (choice == 1) { displayOrder(car, cars, order, orders, 100, 100); }
-	if (choice == 2) { createOrder(car, cars, order, orders, 100, 100); }
-	if (choice == 0) { return; }
+	if (choice == 1) { displayOrder(order, cars, orders, n, m, orders_count); }
+	else if (choice == 2) { createOrder(order, cars, orders, 100, orders_count); }
+	else if (choice == 0) { return; }
 }
+
 
 void createCar(Car* cars, int n, int& car_count) {
 	cin.ignore();
@@ -231,45 +239,38 @@ void displayCars(Car* cars, const int cars_count) {
 	_getch();
 }
 
-void createOrder(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m) {
-	order->order_count;
+void createOrder(ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int& order_count) {
 	cin.ignore();
-	car->car_count;
+	ServiceOrder temp;
 	cout << "Марка автомобиля?\n";
-	gets_s(cars[car->car_count].brand);
+	gets_s(temp.car.brand);
 	cout << "Модель автомобиля?\n";
-	gets_s(cars[car->car_count].model);
+	gets_s(temp.car.model);
 	cout << "Год выпуска автомобиля?\n";
-	gets_s(cars[car->car_count].year);
+	gets_s(temp.car.year);
 	cout << "Номерной знак автомобиля?\n";
-	gets_s(cars[car->car_count++].licensePlate);
+	gets_s(temp.car.licensePlate);
 	cout << "Введите дату и время приема заказа.\n";
-	gets_s(orders[order->order_count].dateTime);
+	gets_s(temp.dateTime);
 	cout << "Введите описание работ\n";
-	cout << "\n\n";
-	gets_s(orders[order->order_count++].description);
-	saveOrderInFile(order);
-	choiceMenuOrders(car, cars, order, orders, 100, 100);
+	gets_s(temp.description);
+	saveOrderInFile(&temp);
+	orders[order_count++] = temp;
+	choiceMenuOrders(order, cars, &temp, 100, 100, order_count); 
 }
 
-void displayOrder(Car* car, Car* cars, ServiceOrder* order, ServiceOrder* orders, int n, int m) {
-	order->order_count;
-	car->car_count;
-	int index = 0;
-	int index1 = 0;
+void displayOrder(const ServiceOrder& order, Car* cars, ServiceOrder* orders, int n, int m, int& orders_count) {
 	cout << "Вы добавили заказ:\n\n";
-	cout << "Автомобиль: " << "\n";
-	for (index = 0; index < car->car_count; index++) {
-		cout << "Марка: " << cars[index].brand << "\n\n";
-		cout << "Модель: " << cars[index].model << "\n\n";
-		cout << "Год выпуска: " << cars[index].year << "\n\n";
-		cout << "Номерной знак: " << cars[index].licensePlate << "\n\n";
-	}
-	for (index1 = 0; index1 < order->order_count; index1++) {
-		cout << "Дата и время: " << orders[index1].dateTime << "\n\n";
-		cout << "Описание работ: " << orders[index1].description << "\n\n";
-	}
-	choiceMenuOrders(car, cars, order, orders, 100, 100);
+	cout << "Марка автомобиля: " << order.car.brand << "\n\n";
+	cout << "Модель автомобиля: " << order.car.model << "\n\n";
+	cout << "Год выпуска автомобиля: " << order.car.year << "\n\n";
+	cout << "Номерной знак автомобиля: " << order.car.licensePlate << "\n\n";
+
+	cout << "Дата и время: " << order.dateTime << "\n\n";
+	cout << "Описание работ: " << order.description << "\n\n";
+
+	//choiceMenuOrders(order, cars, orders, 100, 100, orders_count);
+	_getch();
 }
 
 void findAutoInFile(Car* car, Car* cars, int n) {
@@ -295,11 +296,11 @@ void saveCarInFile(const Car& car) {
 }
 
 void saveOrderInFile(ServiceOrder* order) {
-	FILE* save;
+	FILE* save = nullptr;
 	fopen_s(&save, "2.txt", "a");
 
 	fwrite(&order, sizeof(ServiceOrder), 1, save);
-	fclose(save);
+	if (save != nullptr) fclose(save);
 }
 
 void showCarsInFile() {
